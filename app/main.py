@@ -10,39 +10,39 @@ from app.adapters.llm import get_llm_adapter
 from app.adapters.source import get_source_adapter
 from app.adapters.output import get_output_adapter
 
-# 設定 logging
+# Setup logging
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# 建立 FastAPI app
+# Create FastAPI app
 app = FastAPI(
     title="Adaptive Intelligence Pipeline",
     description="""
-    一個可抽換元件的 AI 資訊整合系統
+    A switchable-component AI information integration system
     
-    ## 特色
-    - 🔌 LLM 服務可抽換（Claude API / AWS Bedrock / Azure OpenAI / SageMaker）
-    - 📊 資料來源可抽換（arXiv / NewsAPI / 內部資料庫）
-    - 📤 輸出格式可抽換（Console / Notion / Email / Slack）
-    - 🎯 支援多種場景（學術追蹤 / 投資分析）
+    ## Features
+    - 🔌 Switchable LLM services (Claude API / AWS Bedrock / Azure OpenAI / SageMaker)
+    - 📊 Switchable data sources (arXiv / NewsAPI / Internal database)
+    - 📤 Switchable output formats (Console / Notion / Email / Slack)
+    - 🎯 Multiple scenarios (Academic tracking / Investment analysis)
     
-    ## 快速開始
-    1. 設定 `.env` 檔案
-    2. 呼叫 `/pipeline/run` 端點
-    3. 查看生成的報告
+    ## Quick Start
+    1. Configure `.env` file
+    2. Call `/pipeline/run` endpoint
+    3. View generated report
     """,
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
 
-# CORS 設定（如果需要前端呼叫）
+# CORS settings (if frontend needs to call)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 生產環境應該限制特定 domain
+    allow_origins=["*"],  # Should restrict to specific domains in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,11 +51,11 @@ app.add_middleware(
 
 @app.get("/", tags=["Root"])
 async def root():
-    """根路徑 - API 資訊"""
+    """Root path - API information"""
     return {
         "name": "Adaptive Intelligence Pipeline",
         "version": "1.0.0",
-        "description": "可抽換元件的 AI 資訊整合系統",
+        "description": "Switchable-component AI information integration system",
         "docs": "/docs",
         "health": "/health"
     }
@@ -64,7 +64,7 @@ async def root():
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 async def health_check():
     """
-    健康檢查 - 顯示目前使用的 providers
+    Health check - shows currently used providers
     """
     try:
         llm = get_llm_adapter()
@@ -88,34 +88,34 @@ async def health_check():
 @app.post("/pipeline/run", response_model=PipelineResponse, tags=["Pipeline"])
 async def run_pipeline(request: PipelineRequest):
     """
-    執行完整的資料處理 pipeline
+    Execute complete data processing pipeline
     
-    ## 流程
-    1. 從資料來源獲取資料（根據 SOURCE_PROVIDER）
-    2. 使用 LLM 分析和生成報告（根據 LLM_PROVIDER）
-    3. 輸出到目標位置（根據 OUTPUT_PROVIDER）
+    ## Process
+    1. Fetch data from source (based on SOURCE_PROVIDER)
+    2. Analyze and generate report with LLM (based on LLM_PROVIDER)
+    3. Output to destination (based on OUTPUT_PROVIDER)
     
-    ## 範例
+    ## Examples
     
-    ### 學術論文追蹤
+    ### Academic Paper Tracking
     ```json
     {
       "query": "machine learning OR transformers",
       "template": "academic",
       "max_results": 10,
       "date_range": "last_week",
-      "output_title": "本週 ML 論文摘要"
+      "output_title": "Weekly ML Paper Summary"
     }
     ```
     
-    ### 投資新聞分析
+    ### Investment News Analysis
     ```json
     {
       "query": "TSMC OR NVIDIA",
       "template": "financial",
       "max_results": 20,
       "date_range": "today",
-      "output_title": "今日半導體產業動態"
+      "output_title": "Today's Semiconductor Industry Updates"
     }
     ```
     """
@@ -138,7 +138,7 @@ async def run_pipeline(request: PipelineRequest):
 @app.get("/config", tags=["System"])
 async def get_config():
     """
-    顯示目前的設定（不包含敏感資訊）
+    Show current configuration (excluding sensitive information)
     """
     return {
         "llm_provider": settings.LLM_PROVIDER,
@@ -148,21 +148,21 @@ async def get_config():
     }
 
 
-# 啟動事件
+# Startup event
 @app.on_event("startup")
 async def startup_event():
     logger.info("=" * 60)
-    logger.info("Adaptive Intelligence Pipeline 啟動中...")
+    logger.info("Adaptive Intelligence Pipeline starting...")
     logger.info(f"LLM Provider: {settings.LLM_PROVIDER}")
     logger.info(f"Source Provider: {settings.SOURCE_PROVIDER}")
     logger.info(f"Output Provider: {settings.OUTPUT_PROVIDER}")
     logger.info("=" * 60)
 
 
-# 關閉事件
+# Shutdown event
 @app.on_event("shutdown")
 async def shutdown_event():
-    logger.info("Adaptive Intelligence Pipeline 關閉中...")
+    logger.info("Adaptive Intelligence Pipeline shutting down...")
 
 
 if __name__ == "__main__":

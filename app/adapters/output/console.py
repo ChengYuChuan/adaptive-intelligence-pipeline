@@ -5,23 +5,23 @@ from app.adapters.output.base import BaseOutputAdapter
 
 class ConsoleOutputAdapter(BaseOutputAdapter):
     """
-    輸出到 Console（標準輸出）
-    適合：開發測試、快速驗證
+    Output to Console (standard output)
+    Suitable for: Development testing, quick verification
     """
     
     async def send(self, content: str, metadata: Dict[str, Any] = None) -> Dict[str, Any]:
-        """直接印到 console"""
+        """Print directly to console"""
         
         print("\n" + "="*80)
-        print("📊 報告生成完成")
+        print("📊 Report Generated")
         print("="*80)
         
         if metadata:
-            print("\n📋 元資料:")
+            print("\n📋 Metadata:")
             for key, value in metadata.items():
                 print(f"  {key}: {value}")
         
-        print("\n📄 內容:")
+        print("\n📄 Content:")
         print("-"*80)
         print(content)
         print("-"*80)
@@ -29,7 +29,7 @@ class ConsoleOutputAdapter(BaseOutputAdapter):
         
         return {
             "status": "success",
-            "message": "成功輸出到 console",
+            "message": "Successfully output to console",
             "url": None,
             "timestamp": datetime.now().isoformat()
         }

@@ -7,13 +7,13 @@ import httpx
 
 class NotionAdapter(BaseOutputAdapter):
     """
-    輸出到 Notion Database
-    適合：個人知識管理、團隊共享
+    Output to Notion Database
+    Suitable for: Personal knowledge management, team sharing
     
-    需要在 Notion 中：
-    1. 建立一個 Database
-    2. 建立 Integration 並取得 API key
-    3. 把 Integration 加到 Database
+    Requirements in Notion:
+    1. Create a Database
+    2. Create an Integration and get API key
+    3. Add the Integration to the Database
     """
     
     def __init__(self):
@@ -28,31 +28,31 @@ class NotionAdapter(BaseOutputAdapter):
     
     async def send(self, content: str, metadata: Dict[str, Any] = None) -> Dict[str, Any]:
         """
-        在 Notion Database 中建立新頁面
+        Create a new page in Notion Database
         
-        metadata 可包含：
-        - title: 頁面標題
-        - tags: 標籤列表
-        - date: 日期
+        metadata can include:
+        - title: Page title
+        - tags: List of tags
+        - date: Date
         """
         
         if not self.api_key or not self.database_id:
             return {
                 "status": "failed",
-                "message": "Notion API key 或 Database ID 未設定",
+                "message": "Notion API key or Database ID not configured",
                 "url": None,
                 "timestamp": datetime.now().isoformat()
             }
         
         metadata = metadata or {}
-        title = metadata.get("title", f"報告 - {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+        title = metadata.get("title", f"Report - {datetime.now().strftime('%Y-%m-%d %H:%M')}")
         tags = metadata.get("tags", [])
         
-        # 建立 Notion 頁面
+        # Create Notion page
         page_data = {
             "parent": {"database_id": self.database_id},
             "properties": {
-                "Name": {  # 標題屬性（大部分 Database 都有）
+                "Name": {  # Title property (most databases have this)
                     "title": [
                         {
                             "text": {
@@ -71,7 +71,7 @@ class NotionAdapter(BaseOutputAdapter):
                             {
                                 "type": "text",
                                 "text": {
-                                    "content": content[:2000]  # Notion 單一 block 限制
+                                    "content": content[:2000]  # Notion single block limit
                                 }
                             }
                         ]
@@ -80,7 +80,7 @@ class NotionAdapter(BaseOutputAdapter):
             ]
         }
         
-        # 如果有標籤（需要 Database 有 Tags 屬性）
+        # Add tags if present (requires Tags property in Database)
         if tags:
             page_data["properties"]["Tags"] = {
                 "multi_select": [{"name": tag} for tag in tags]
@@ -99,14 +99,14 @@ class NotionAdapter(BaseOutputAdapter):
                     data = response.json()
                     return {
                         "status": "success",
-                        "message": "成功建立 Notion 頁面",
+                        "message": "Successfully created Notion page",
                         "url": data.get("url"),
                         "timestamp": datetime.now().isoformat()
                     }
                 else:
                     return {
                         "status": "failed",
-                        "message": f"Notion API 錯誤: {response.status_code} - {response.text}",
+                        "message": f"Notion API error: {response.status_code} - {response.text}",
                         "url": None,
                         "timestamp": datetime.now().isoformat()
                     }
@@ -114,7 +114,7 @@ class NotionAdapter(BaseOutputAdapter):
         except Exception as e:
             return {
                 "status": "failed",
-                "message": f"發送到 Notion 失敗: {str(e)}",
+                "message": f"Failed to send to Notion: {str(e)}",
                 "url": None,
                 "timestamp": datetime.now().isoformat()
             }

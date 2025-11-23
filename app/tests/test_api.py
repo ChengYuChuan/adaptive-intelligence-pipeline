@@ -6,7 +6,7 @@ client = TestClient(app)
 
 
 def test_root():
-    """測試根路徑"""
+    """Test root path"""
     response = client.get("/")
     assert response.status_code == 200
     data = response.json()
@@ -15,7 +15,7 @@ def test_root():
 
 
 def test_health_check():
-    """測試健康檢查"""
+    """Test health check"""
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
@@ -27,7 +27,7 @@ def test_health_check():
 
 
 def test_get_config():
-    """測試取得設定"""
+    """Test get configuration"""
     response = client.get("/config")
     assert response.status_code == 200
     data = response.json()
@@ -37,18 +37,18 @@ def test_get_config():
 
 
 def test_openapi_docs():
-    """測試 OpenAPI 文件"""
+    """Test OpenAPI documentation"""
     response = client.get("/docs")
     assert response.status_code == 200
 
 
 def test_pipeline_validation():
-    """測試 pipeline 請求驗證"""
-    # 缺少必要欄位
+    """Test pipeline request validation"""
+    # Missing required fields
     response = client.post("/pipeline/run", json={})
     assert response.status_code == 422  # Validation error
     
-    # 無效的 template
+    # Invalid template
     response = client.post("/pipeline/run", json={
         "query": "test",
         "template": "invalid_template"
@@ -56,9 +56,9 @@ def test_pipeline_validation():
     assert response.status_code == 422
 
 
-@pytest.mark.skip(reason="需要實際的 API keys，在有設定時才執行")
+@pytest.mark.skip(reason="Requires actual API keys, only run when configured")
 def test_pipeline_run():
-    """測試完整 pipeline（需要實際 API keys）"""
+    """Test complete pipeline (requires actual API keys)"""
     response = client.post("/pipeline/run", json={
         "query": "machine learning",
         "template": "academic",

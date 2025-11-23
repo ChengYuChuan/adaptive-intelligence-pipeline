@@ -7,8 +7,8 @@ import json
 
 class ClaudeAPIAdapter(BaseLLMAdapter):
     """
-    使用 Anthropic Claude API 的 Adapter
-    適合：開發階段、Demo、快速原型
+    Adapter for Anthropic Claude API
+    Suitable for: Development, Demo, Quick prototyping
     """
     
     def __init__(self):
@@ -17,7 +17,7 @@ class ClaudeAPIAdapter(BaseLLMAdapter):
         self.max_tokens = 2048
     
     async def _call_claude(self, system_prompt: str, user_message: str) -> str:
-        """內部方法：呼叫 Claude API"""
+        """Internal method to call Claude API"""
         response = self.client.messages.create(
             model=self.model,
             max_tokens=self.max_tokens,
@@ -30,32 +30,32 @@ class ClaudeAPIAdapter(BaseLLMAdapter):
         return response.content[0].text
     
     async def summarize(self, text: str, max_length: int = 300) -> str:
-        system_prompt = f"""你是一個專業的摘要助手。
-請用繁體中文提供清晰、精確的摘要，不超過 {max_length} 字。
-摘要應該保留最重要的資訊和關鍵細節。"""
+        system_prompt = f"""You are a professional summarization assistant.
+Provide a clear and accurate summary in Traditional Chinese, not exceeding {max_length} characters.
+The summary should preserve the most important information and key details."""
         
-        user_message = f"請摘要以下內容：\n\n{text}"
+        user_message = f"Please summarize the following content:\n\n{text}"
         
         return await self._call_claude(system_prompt, user_message)
     
     async def analyze_sentiment(self, text: str) -> Dict[str, Any]:
-        system_prompt = """你是情緒分析專家。
-分析文本的情緒傾向，並以 JSON 格式回覆：
+        system_prompt = """You are a sentiment analysis expert.
+Analyze the sentiment of the text and respond in JSON format:
 {
   "sentiment": "positive" | "negative" | "neutral",
   "confidence": 0.0-1.0,
-  "reasoning": "簡短解釋為何是這個情緒"
+  "reasoning": "Brief explanation of why this sentiment"
 }
 
-只回覆 JSON，不要有其他文字。"""
+Respond with only JSON, no other text."""
         
-        user_message = f"請分析以下文本的情緒：\n\n{text}"
+        user_message = f"Please analyze the sentiment of the following text:\n\n{text}"
         
         response = await self._call_claude(system_prompt, user_message)
         
-        # 解析 JSON 回應
+        # Parse JSON response
         try:
-            # 移除可能的 markdown 標記
+            # Remove possible markdown markers
             response = response.strip()
             if response.startswith("```json"):
                 response = response[7:]
@@ -66,24 +66,24 @@ class ClaudeAPIAdapter(BaseLLMAdapter):
             
             return json.loads(response.strip())
         except json.JSONDecodeError:
-            # 如果解析失敗，返回預設結構
+            # Return default structure if parsing fails
             return {
                 "sentiment": "neutral",
                 "confidence": 0.5,
-                "reasoning": "無法解析回應"
+                "reasoning": "Failed to parse response"
             }
     
     async def extract_key_points(self, text: str, num_points: int = 5) -> List[str]:
-        system_prompt = f"""你是內容分析專家。
-從文本中提取 {num_points} 個最重要的關鍵要點。
-每個要點用一句話表達，用繁體中文。
-請以列表形式回覆，每行一個要點，開頭用 "- "。"""
+        system_prompt = f"""You are a content analysis expert.
+Extract {num_points} most important key points from the text.
+Express each point in one sentence, in Traditional Chinese.
+Respond in list format, each line starting with "- "."""
         
-        user_message = f"請從以下內容提取關鍵要點：\n\n{text}"
+        user_message = f"Please extract key points from the following content:\n\n{text}"
         
         response = await self._call_claude(system_prompt, user_message)
         
-        # 解析列表
+        # Parse list
         points = [
             line.strip("- ").strip() 
             for line in response.split("\n") 
@@ -98,46 +98,50 @@ class ClaudeAPIAdapter(BaseLLMAdapter):
         template: str,
         language: str = "zh-TW"
     ) -> str:
-        # 根據模板選擇不同的 system prompt
+        # Select system prompt based on template
         if template == "academic":
-            system_prompt = """你是學術論文分析專家。
-請生成一份專業的學術文獻彙整報告，包含：
-1. 整體趨勢摘要
-2. 重點論文列表（標題、作者、核心貢獻）
-3. 關鍵發現
-4. 推薦閱讀
+            system_prompt = """You are an academic paper analysis expert.
+Generate a professional academic literature summary report, including:
+1. Overall trends summary
+2. Key papers list (title, authors, core contributions)
+3. Key findings
+4. Recommended reading
 
-使用繁體中文，保持學術專業的語氣。"""
+Use Traditional Chinese and maintain an academic professional tone."""
         
         elif template == "financial":
-            system_prompt = """你是金融分析師。
-請生成一份投資分析報告，包含：
-1. 市場動態摘要
-2. 關鍵新聞及影響
-3. 情緒分析（利多/利空）
-4. 相關公司動態
-5. 建議關注事項
+            system_prompt = """You are a financial analyst.
+Generate an investment analysis report, including:
+1. Market dynamics summary
+2. Key news and impacts
+3. Sentiment analysis (bullish/bearish)
+4. Related company movements
+5. Points to watch
 
-使用繁體中文，保持專業客觀的語氣。"""
+Use Traditional Chinese and maintain a professional objective tone."""
         
         else:
-            system_prompt = "你是專業分析師，請根據提供的資料生成一份完整報告。使用繁體中文。"
+            system_prompt = "You are a professional analyst. Generate a comprehensive report based on the provided data. Use Traditional Chinese."
         
-        # 將資料轉換為 JSON 字串
+        # Convert data to JSON string
         data_str = json.dumps(data, ensure_ascii=False, indent=2)
-        user_message = f"請根據以下資料生成報告：\n\n{data_str}"
+        user_message = f"Please generate a report based on the following data:\n\n{data_str}"
         
         return await self._call_claude(system_prompt, user_message)
     
     async def answer_question(self, question: str, context: str) -> str:
-        system_prompt = """你是專業的問答助手。
-根據提供的上下文回答問題，保持客觀準確。
-如果上下文中沒有足夠資訊，請明確指出。
-使用繁體中文回答。"""
+        system_prompt = """You are a professional Q&A assistant.
+Answer questions based on the provided context, maintaining objectivity and accuracy.
+If there is insufficient information in the context, clearly state so.
+Answer in Traditional Chinese."""
         
-        user_message = f"""上下文：
+        user_message = f"""Context:
 {context}
 
-問題：{question}"""
+Question: {question}"""
         
         return await self._call_claude(system_prompt, user_message)
+    
+    def get_provider_name(self) -> str:
+        """Return the provider name"""
+        return "ClaudeAPI"

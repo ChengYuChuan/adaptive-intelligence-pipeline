@@ -1,4 +1,4 @@
-import app.adapters.source.arxiv as arxiv
+import arxiv
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
 from app.adapters.source.base import BaseSourceAdapter
@@ -6,8 +6,8 @@ from app.adapters.source.base import BaseSourceAdapter
 
 class ArXivAdapter(BaseSourceAdapter):
     """
-    arXiv 學術論文資料來源
-    適合：學術論文追蹤場景
+    arXiv academic paper data source
+    Suitable for: Academic paper tracking scenarios
     """
     
     def __init__(self):
@@ -21,22 +21,22 @@ class ArXivAdapter(BaseSourceAdapter):
         date_to: datetime = None
     ) -> List[Dict[str, Any]]:
         """
-        從 arXiv 獲取論文
+        Fetch papers from arXiv
         
-        範例 query:
+        Example queries:
         - "machine learning"
-        - "cat:cs.LG" (機器學習類別)
-        - "au:Hinton" (特定作者)
-        - "ti:transformer" (標題包含 transformer)
+        - "cat:cs.LG" (machine learning category)
+        - "au:Hinton" (specific author)
+        - "ti:transformer" (title contains transformer)
         """
         
-        # 如果沒有指定日期範圍，預設最近一週
+        # Default to last week if no date range specified
         if not date_from:
             date_from = datetime.now() - timedelta(days=7)
         if not date_to:
             date_to = datetime.now()
         
-        # arXiv 的搜尋語法
+        # arXiv search syntax
         search = arxiv.Search(
             query=query,
             max_results=max_results,
@@ -47,17 +47,17 @@ class ArXivAdapter(BaseSourceAdapter):
         results = []
         
         for paper in self.client.results(search):
-            # 過濾日期
+            # Filter by date
             if paper.published.replace(tzinfo=None) < date_from:
                 continue
             if paper.published.replace(tzinfo=None) > date_to:
                 continue
             
-            # 標準化資料格式
+            # Standardize data format
             standardized = {
                 "id": paper.entry_id,
                 "title": paper.title,
-                "content": paper.summary,  # arXiv 的 abstract
+                "content": paper.summary,  # arXiv abstract
                 "summary": paper.summary[:200] + "..." if len(paper.summary) > 200 else paper.summary,
                 "authors": [author.name for author in paper.authors],
                 "published_date": paper.published.isoformat(),

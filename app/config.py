@@ -3,9 +3,9 @@ from typing import Literal
 
 
 class Settings(BaseSettings):
-    """環境設定 - 所有可切換的設定都在這裡"""
+    """Environment settings - all switchable configurations are here"""
     
-    # ===== LLM 設定 =====
+    # ===== LLM Settings =====
     LLM_PROVIDER: Literal["claude", "bedrock", "azure", "sagemaker"] = "claude"
     
     # Claude API
@@ -27,13 +27,13 @@ class Settings(BaseSettings):
     # SageMaker
     SAGEMAKER_ENDPOINT: str = ""
     
-    # ===== 資料來源設定 =====
+    # ===== Data Source Settings =====
     SOURCE_PROVIDER: Literal["arxiv", "newsapi", "internal"] = "arxiv"
     
     # NewsAPI
     NEWSAPI_KEY: str = ""
     
-    # ===== 輸出設定 =====
+    # ===== Output Settings =====
     OUTPUT_PROVIDER: Literal["notion", "email", "slack", "console"] = "console"
     
     # Notion
@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     # Slack
     SLACK_WEBHOOK_URL: str = ""
     
-    # ===== 通用設定 =====
+    # ===== General Settings =====
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
     
@@ -60,5 +60,5 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
 
 
-# 全域設定實例
+# Global settings instance
 settings = Settings()

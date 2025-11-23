@@ -1,24 +1,24 @@
 FROM python:3.11-slim
 
-# 設定工作目錄
+# Set working directory
 WORKDIR /app
 
-# 安裝系統依賴
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# 複製 requirements
+# Copy requirements
 COPY requirements.txt .
 
-# 安裝 Python 依賴
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 複製專案檔案
+# Copy project files
 COPY . .
 
-# 暴露端口
+# Expose port
 EXPOSE 8000
 
-# 啟動指令
+# Start command
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

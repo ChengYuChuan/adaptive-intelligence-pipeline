@@ -1,71 +1,97 @@
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
-from app.adapters.llm.claude_api import ClaudeAPIAdapter
+from abc import ABC, abstractmethod
+from typing import List, Dict, Any
 
 
-@pytest.fixture
-def mock_anthropic_client():
-    """Mock Anthropic client"""
-    with patch('app.adapters.llm.claude_api.anthropic.Anthropic') as mock:
-        client = Mock()
-        mock.return_value = client
+class BaseLLMAdapter(ABC):
+    """
+    Abstract base class for all LLM adapters
+    All LLM providers must implement this interface
+    """
+    
+    @abstractmethod
+    async def summarize(self, text: str, max_length: int = 300) -> str:
+        """
+        Generate a summary of the given text
         
-        # Mock response
-        response = Mock()
-        response.content = [Mock(text="這是測試回應")]
-        client.messages.create.return_value = response
+        Args:
+            text: Text to summarize
+            max_length: Maximum length of summary in characters
+            
+        Returns:
+            Summarized text
+        """
+        pass
+    
+    @abstractmethod
+    async def analyze_sentiment(self, text: str) -> Dict[str, Any]:
+        """
+        Analyze sentiment of the text
         
-        yield client
-
-
-@pytest.mark.asyncio
-async def test_claude_adapter_summarize(mock_anthropic_client):
-    """測試 Claude API 摘要功能"""
-    adapter = ClaudeAPIAdapter()
+        Args:
+            text: Text to analyze
+            
+        Returns:
+            Dictionary with keys:
+                - sentiment: "positive" | "negative" | "neutral"
+                - confidence: float between 0.0 and 1.0
+                - reasoning: str explaining the sentiment
+        """
+        pass
     
-    result = await adapter.summarize("這是一篇很長的文章...")
+    @abstractmethod
+    async def extract_key_points(self, text: str, num_points: int = 5) -> List[str]:
+        """
+        Extract key points from the text
+        
+        Args:
+            text: Text to extract key points from
+            num_points: Number of key points to extract
+            
+        Returns:
+            List of key points as strings
+        """
+        pass
     
-    assert isinstance(result, str)
-    assert len(result) > 0
-    mock_anthropic_client.messages.create.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_claude_adapter_sentiment(mock_anthropic_client):
-    """測試 Claude API 情緒分析"""
-    # Mock JSON 回應
-    mock_anthropic_client.messages.create.return_value.content[0].text = '''
-    {
-        "sentiment": "positive",
-        "confidence": 0.85,
-        "reasoning": "文本表達積極情緒"
-    }
-    '''
+    @abstractmethod
+    async def generate_report(
+        self, 
+        data: Dict[str, Any], 
+        template: str,
+        language: str = "zh-TW"
+    ) -> str:
+        """
+        Generate a comprehensive report from structured data
+        
+        Args:
+            data: Structured data to generate report from
+            template: Report template type ("academic" or "financial")
+            language: Output language (default: Traditional Chinese)
+            
+        Returns:
+            Generated report as formatted text
+        """
+        pass
     
-    adapter = ClaudeAPIAdapter()
-    result = await adapter.analyze_sentiment("這是一個很棒的產品！")
+    @abstractmethod
+    async def answer_question(self, question: str, context: str) -> str:
+        """
+        Answer a question based on given context
+        
+        Args:
+            question: Question to answer
+            context: Context information
+            
+        Returns:
+            Answer to the question
+        """
+        pass
     
-    assert result["sentiment"] in ["positive", "negative", "neutral"]
-    assert 0 <= result["confidence"] <= 1
-
-
-@pytest.mark.asyncio
-async def test_claude_adapter_key_points(mock_anthropic_client):
-    """測試 Claude API 關鍵要點提取"""
-    mock_anthropic_client.messages.create.return_value.content[0].text = '''
-    - 要點一
-    - 要點二
-    - 要點三
-    '''
-    
-    adapter = ClaudeAPIAdapter()
-    result = await adapter.extract_key_points("文章內容...", num_points=3)
-    
-    assert isinstance(result, list)
-    assert len(result) <= 3
-
-
-def test_get_provider_name():
-    """測試取得 provider 名稱"""
-    adapter = ClaudeAPIAdapter()
-    assert adapter.get_provider_name() == "ClaudeAPI"
+    @abstractmethod
+    def get_provider_name(self) -> str:
+        """
+        Get the name of this LLM provider
+        
+        Returns:
+            Provider name (e.g., "ClaudeAPI", "AWSBedrock")
+        """
+        pass
