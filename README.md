@@ -72,7 +72,7 @@ A production-ready, switchable-component AI information integration system suppo
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/adaptive-intelligence-pipeline.git
+git clone https://github.com/ChengYuChuan/adaptive-intelligence-pipeline.git
 cd adaptive-intelligence-pipeline
 
 # Create virtual environment
