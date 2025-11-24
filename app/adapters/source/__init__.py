@@ -20,7 +20,7 @@ def get_source_adapter() -> BaseSourceAdapter:
     
     elif provider == "newsapi":
         from app.adapters.source.newsapi import NewsAPIAdapter
-        raise NotImplementedError("NewsAPI adapter coming in Week 2")
+        return NewsAPIAdapter()
     
     elif provider == "internal":
         # Week 2: Internal database implementation

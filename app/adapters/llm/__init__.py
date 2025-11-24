@@ -20,7 +20,7 @@ def get_llm_adapter() -> BaseLLMAdapter:
     
     elif provider == "bedrock":
         from app.adapters.llm.bedrock import AWSBedrockAdapter
-        raise NotImplementedError("AWS Bedrock adapter coming in Week 2")
+        return AWSBedrockAdapter()
     
     elif provider == "azure":
         # Week 2: Azure OpenAI implementation

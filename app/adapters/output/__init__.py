@@ -24,7 +24,7 @@ def get_output_adapter() -> BaseOutputAdapter:
     
     elif provider == "email":
         from app.adapters.output.email import EmailAdapter
-        raise NotImplementedError("Email adapter coming in Week 2")
+        return EmailAdapter()
     
     elif provider == "slack":
         # Week 2: Slack implementation

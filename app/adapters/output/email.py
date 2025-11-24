@@ -201,24 +201,54 @@ class EmailAdapter(BaseOutputAdapter):
         return message
     
     async def _send_email(self, message: MIMEMultipart, all_recipients: list):
-        """Send email via SMTP"""
+        """
+        Send email via SMTP
+        Supports both port 587 (STARTTLS) and port 465 (direct SSL)
+        """
         
-        # Create SMTP client
-        async with aiosmtplib.SMTP(
-            hostname=self.smtp_host,
-            port=self.smtp_port,
-            use_tls=False,  # We'll use STARTTLS
-            timeout=30
-        ) as smtp:
-            # Connect and authenticate
+        # Determine connection method based on port
+        use_direct_ssl = (self.smtp_port == 465)
+        
+        try:
+            # Create SMTP client
+            smtp = aiosmtplib.SMTP(
+                hostname=self.smtp_host,
+                port=self.smtp_port,
+                use_tls=use_direct_ssl,  # True for port 465, False for 587
+                timeout=30
+            )
+            
+            # Connect to server
             await smtp.connect()
-            await smtp.starttls()  # Upgrade to TLS
+            logger.debug(f"Connected to {self.smtp_host}:{self.smtp_port}")
+            
+            # Upgrade to TLS if using port 587
+            if not use_direct_ssl and self.smtp_port == 587:
+                await smtp.starttls()
+                logger.debug("STARTTLS successful")
+            
+            # Authenticate
             await smtp.login(self.smtp_username, self.smtp_password)
+            logger.debug("SMTP authentication successful")
             
             # Send message
             await smtp.send_message(message)
+            logger.info(f"Email sent to {len(all_recipients)} recipient(s)")
             
-            logger.debug(f"SMTP send completed to {all_recipients}")
+            # Close connection
+            await smtp.quit()
+            
+        except aiosmtplib.SMTPAuthenticationError as e:
+            logger.error(f"SMTP authentication failed: {e}")
+            raise Exception(f"Email authentication failed: {e}")
+        
+        except asyncio.TimeoutError:
+            logger.error("SMTP connection timeout")
+            raise Exception(f"Connection to {self.smtp_host}:{self.smtp_port} timeout")
+        
+        except Exception as e:
+            logger.error(f"SMTP error: {type(e).__name__}: {e}")
+            raise
     
     def _markdown_to_html(self, content: str) -> str:
         """
