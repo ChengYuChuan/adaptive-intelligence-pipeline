@@ -1,27 +1,17 @@
-# FastAPI related
+# Week 2
+newsapi-python==0.2.7   # NewsAPI client
+boto3==1.35.0           # AWS SDK
+aiosmtplib==3.0.2       # Async SMTP client
+
+# Week 1
 fastapi==0.115.5
 uvicorn[standard]==0.32.1
 pydantic==2.10.3
 pydantic-settings==2.6.1
-
-# LLM providers
 anthropic==0.39.0
-# boto3==1.35.0  # AWS Bedrock / SageMaker - Week 2
-# openai==1.54.0  # Azure OpenAI - Week 2
-
-# Data sources
 arxiv==2.1.3
 httpx==0.27.2
-# newsapi-python==0.2.7  # NewsAPI - Week 2
-
-# Output
-# aiosmtplib==3.0.2  # Email - Week 2
-# python-multipart==0.0.18  # File upload support
-
-# Testing
 pytest==8.3.4
 pytest-asyncio==0.24.0
 pytest-cov==6.0.0
-
-# Development tools
 python-dotenv==1.0.1

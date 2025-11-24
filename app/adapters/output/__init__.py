@@ -23,7 +23,7 @@ def get_output_adapter() -> BaseOutputAdapter:
         return NotionAdapter()
     
     elif provider == "email":
-        # Week 2: Email implementation
+        from app.adapters.output.email import EmailAdapter
         raise NotImplementedError("Email adapter coming in Week 2")
     
     elif provider == "slack":

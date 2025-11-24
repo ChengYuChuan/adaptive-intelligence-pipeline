@@ -19,7 +19,7 @@ def get_source_adapter() -> BaseSourceAdapter:
         return ArXivAdapter()
     
     elif provider == "newsapi":
-        # Week 2: NewsAPI implementation
+        from app.adapters.source.newsapi import NewsAPIAdapter
         raise NotImplementedError("NewsAPI adapter coming in Week 2")
     
     elif provider == "internal":

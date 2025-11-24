@@ -19,7 +19,7 @@ def get_llm_adapter() -> BaseLLMAdapter:
         return ClaudeAPIAdapter()
     
     elif provider == "bedrock":
-        # Week 2: AWS Bedrock implementation
+        from app.adapters.llm.bedrock import AWSBedrockAdapter
         raise NotImplementedError("AWS Bedrock adapter coming in Week 2")
     
     elif provider == "azure":
