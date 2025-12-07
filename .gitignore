@@ -217,3 +217,13 @@ __marimo__/
 
 # self-reading docs
 self_DOCS/
+
+# uv
+.venv/
+uv.lock
+
+# Data folders (Week 3)
+data/documents/*
+data/vectorstore/*
+!data/documents/.gitkeep
+!data/vectorstore/.gitkeep

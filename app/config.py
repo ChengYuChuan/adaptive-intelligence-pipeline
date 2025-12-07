@@ -59,6 +59,21 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
+    # ===== RAG Settings (Week 3) =====
+    # Vector Store
+    VECTORSTORE_PROVIDER: Literal["chroma", "pgvector", "azure"] = "chroma"
+    CHROMA_PERSIST_DIR: str = "./data/vectorstore"
+    
+    # Embedding
+    EMBEDDING_PROVIDER: Literal["openai", "bedrock", "local"] = "openai"
+    OPENAI_API_KEY: str = ""
+    OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-small"
+    
+    # Document Processing
+    CHUNK_SIZE: int = 1000  # Characters per chunk
+    CHUNK_OVERLAP: int = 200  # Overlap between chunks
+    MAX_FILE_SIZE_MB: int = 50  # Maximum upload file size
+
 
 # Global settings instance
 settings = Settings()
