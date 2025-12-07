@@ -29,8 +29,6 @@ class Settings(BaseSettings):
     
     # ===== Data Source Settings =====
     SOURCE_PROVIDER: Literal["arxiv", "newsapi", "internal"] = "arxiv"
-    
-    # NewsAPI
     NEWSAPI_KEY: str = ""
     
     # ===== Output Settings =====
@@ -51,28 +49,48 @@ class Settings(BaseSettings):
     # Slack
     SLACK_WEBHOOK_URL: str = ""
     
-    # ===== General Settings =====
-    DEBUG: bool = False
-    LOG_LEVEL: str = "INFO"
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
     # ===== RAG Settings (Week 3) =====
     # Vector Store
     VECTORSTORE_PROVIDER: Literal["chroma", "pgvector", "azure"] = "chroma"
     CHROMA_PERSIST_DIR: str = "./data/vectorstore"
+    
+    # PgVector (Week 4)
+    PGVECTOR_HOST: str = "localhost"
+    PGVECTOR_PORT: int = 5432
+    PGVECTOR_DATABASE: str = "aip"
+    PGVECTOR_USER: str = "postgres"
+    PGVECTOR_PASSWORD: str = ""
+    PGVECTOR_MIN_CONNECTIONS: int = 2
+    PGVECTOR_MAX_CONNECTIONS: int = 10
     
     # Embedding
     EMBEDDING_PROVIDER: Literal["openai", "bedrock", "local"] = "openai"
     OPENAI_API_KEY: str = ""
     OPENAI_EMBEDDING_MODEL: str = "text-embedding-3-small"
     
+    # Bedrock Embedding (Week 4)
+    BEDROCK_EMBEDDING_MODEL: str = "amazon.titan-embed-text-v2:0"
+    
     # Document Processing
-    CHUNK_SIZE: int = 1000  # Characters per chunk
-    CHUNK_OVERLAP: int = 200  # Overlap between chunks
-    MAX_FILE_SIZE_MB: int = 50  # Maximum upload file size
+    CHUNK_SIZE: int = 1000
+    CHUNK_OVERLAP: int = 200
+    MAX_FILE_SIZE_MB: int = 50
+    
+    # ===== Logging & Monitoring (Week 4) =====
+    LOG_LEVEL: str = "INFO"
+    LOG_FORMAT: Literal["json", "console"] = "console"
+    
+    # Metrics
+    METRICS_ENABLED: bool = True
+    METRICS_PATH: str = "/metrics"
+    
+    # ===== General Settings =====
+    DEBUG: bool = False
+    APP_ENVIRONMENT: Literal["development", "staging", "production"] = "development"
+    
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
 
 # Global settings instance

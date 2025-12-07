@@ -26,8 +26,8 @@ def get_vectorstore_adapter() -> BaseVectorStoreAdapter:
         return ChromaAdapter()
     
     elif provider == "pgvector":
-        # Future: PostgreSQL + pgvector
-        raise NotImplementedError("PgVector adapter coming soon")
+        from app.adapters.vectorstore.pgvector import PgVectorAdapter
+        return PgVectorAdapter()
     
     elif provider == "azure":
         # Future: Azure AI Search

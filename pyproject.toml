@@ -1,12 +1,12 @@
 [project]
 name = "adaptive-intelligence-pipeline"
-version = "0.3.0"
+version = "0.4.0"
 description = "Switchable-component AI information integration system with RAG"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
-    { name = "Yu-Chuan Cheng", email = "your-email@example.com" }
+    { name = "Yu-Chuan Cheng" }
 ]
 
 dependencies = [
@@ -29,12 +29,18 @@ dependencies = [
     # Output Adapters
     "aiosmtplib>=3.0.0",
     
-    # Week 3 - RAG System
+    # RAG System (Week 3)
     "chromadb>=0.4.22",
     "pymupdf>=1.23.8",
     "python-docx>=1.1.0",
     "python-multipart>=0.0.6",
     "tiktoken>=0.5.2",
+    
+    # Week 4 - Production Infrastructure
+    "asyncpg>=0.29.0",
+    "pgvector>=0.2.4",
+    "structlog>=24.1.0",
+    "prometheus-client>=0.19.0",
     
     # Utilities
     "python-dotenv>=1.0.0",
@@ -45,7 +51,7 @@ dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=6.0.0",
-    "ruff>=0.1.0",
+    "ruff>=0.8.0",
     "black>=24.0.0",
     "isort>=5.13.0",
     "mypy>=1.8.0",
@@ -55,6 +61,7 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# 關鍵修正：明確指定 app 目錄
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
 
