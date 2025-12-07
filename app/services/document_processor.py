@@ -137,21 +137,32 @@ class DocumentProcessor:
             
             # Create Document objects for vector store
             documents = []
+            
+            # Convert tags list to comma-separated string (Chroma doesn't accept lists)
+            tags_str = ",".join(metadata.get("tags", []))
+            
             for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
+                # Handle None values - Chroma requires str, int, float, bool, or None
+                chunk_metadata = {
+                    "document_id": doc_id,
+                    "filename": filename,
+                    "chunk_index": chunk.chunk_index,
+                    "tags": tags_str,  # String instead of list
+                    "source": metadata.get("source", "") or "",
+                    "description": metadata.get("description", "") or "",
+                    "uploaded_at": datetime.now().isoformat()
+                }
+                
+                # Only add page_number and section_title if they exist
+                if chunk.page_number is not None:
+                    chunk_metadata["page_number"] = chunk.page_number
+                if chunk.section_title is not None:
+                    chunk_metadata["section_title"] = chunk.section_title
+                
                 doc = Document(
                     id=chunk.chunk_id,
                     content=chunk.content,
-                    metadata={
-                        "document_id": doc_id,
-                        "filename": filename,
-                        "chunk_index": chunk.chunk_index,
-                        "page_number": chunk.page_number,
-                        "section_title": chunk.section_title,
-                        "tags": metadata.get("tags", []),
-                        "source": metadata.get("source", ""),
-                        "description": metadata.get("description", ""),
-                        "uploaded_at": datetime.now().isoformat()
-                    },
+                    metadata=chunk_metadata,
                     embedding=embedding
                 )
                 documents.append(doc)
